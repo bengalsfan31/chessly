@@ -181,6 +181,29 @@ body.noanim *{animation:none!important;transition:none!important}
 #net p{font:400 12px var(--ui);margin:0;text-align:center}#net small{font-size:20px;line-height:1.1}
 #net textarea{width:100%;height:64px;background:#f0dc9c;color:#2a1a10;border:4px solid var(--edge);font:400 15px var(--txt);resize:none}
 .sq.cd .pcs{filter:grayscale(.85) brightness(.75)}.cdb{position:absolute;right:2px;top:2px;font:400 9px var(--ui);color:#7fb4e8;text-shadow:1px 1px 0 #1d2030;z-index:3;pointer-events:none}
+#pl{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:7}
+#pl>div{background:#1d2030;border:4px solid #f6efd8;padding:20px;width:min(92vw,360px);box-shadow:0 8px 0 var(--edge);color:#f6efd8;display:grid;gap:10px}
+#pl p{font:400 12px var(--ui);margin:0;text-align:center}
+#pl .plr{display:flex;justify-content:space-between;align-items:center;font-size:22px;gap:10px;margin-bottom:6px}
+#plL{max-height:220px;overflow:auto;font-size:22px}
+#pln{flex:1;min-width:0;font:400 22px var(--txt);padding:4px 6px;border:4px solid var(--edge);background:#f0dc9c;color:#2a1a10;border-radius:0}
+@keyframes pg{from{filter:drop-shadow(0 0 2px var(--gc)) drop-shadow(0 0 4px var(--gc))}to{filter:drop-shadow(0 0 6px var(--gc)) drop-shadow(0 0 14px var(--gc))}}
+.sq.last .pcs,.sq.last .pc{--gc:#ffd84a;filter:drop-shadow(0 0 5px #ffd84a)}
+.sq.sel .pcs,.sq.sel .pc{filter:drop-shadow(0 0 8px #4dff7a) drop-shadow(0 0 14px #4dff7a)}
+.sq.mv.cp .pcs,.sq.mv.cp .pc{filter:drop-shadow(0 0 6px #ff6a5a) drop-shadow(0 0 12px #ff6a5a)}
+.sq.chk .pcs,.sq.chk .pc{--gc:#ff3b2f;filter:drop-shadow(0 0 6px #ff3b2f) drop-shadow(0 0 12px #ff3b2f)}
+@media(prefers-reduced-motion:no-preference){
+.sq.last .pcs,.sq.last .pc{animation:pg 1.4s ease-in-out infinite alternate}
+.sq.chk .pcs,.sq.chk .pc{animation:jit .3s linear infinite,pg .6s ease-in-out infinite alternate}}
+#opn{background:#1d2030;border:4px solid #f6efd8;padding:8px;margin-bottom:12px;color:#f6efd8;box-shadow:0 4px 0 var(--edge)}
+#opnT{font:400 10px/1.8 var(--ui);min-height:18px}#opnT .co{color:#ffd84a}
+#opnB .bk{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:18px}#opnB button{padding:2px 8px;font-size:18px}#opnB .bk span{color:#aab2c4;line-height:1}
+#opn>button{margin-top:6px;width:100%}
+#ol{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:7}
+#ol>div{background:#1d2030;border:4px solid #f6efd8;padding:20px;width:min(92vw,400px);box-shadow:0 8px 0 var(--edge);color:#f6efd8;display:grid;gap:10px}
+#ol p{font:400 12px var(--ui);margin:0;text-align:center}
+#olq{font:400 22px var(--txt);padding:4px 6px;border:4px solid var(--edge);background:#f0dc9c;color:#2a1a10;border-radius:0}
+#olL{max-height:min(50vh,340px);overflow:auto;display:grid;gap:4px}#olL button{text-align:left;font-size:20px}#olL .st{color:#ffd84a}
 </style>
 </head>
 <body>
@@ -193,12 +216,14 @@ body.noanim *{animation:none!important;transition:none!important}
  <div class="side">
   <h1><span id="logo"></span>Chess</h1>
   <div id="status"></div>
+  <div id="opn"><div id="opnT"></div><div id="opnB"></div><button id="opnAll">Openings</button></div>
   <div class="ctl">
    <label for="mode">Mode</label>
    <select id="mode"><option value="2p">Two players</option><option value="cw">Vs computer (you: White)</option><option value="cb">Vs computer (you: Black)</option><option value="net">Online (friend)</option></select>
    <div id="eloRow" style="display:none"><label for="bot">Opponent</label><select id="bot"></select><label for="bot" id="eloL"></label><input type="range" id="elo" min="1350" max="3000" step="50" value="1800" style="display:none"></div>
    <div class="row2"><div><label for="tc">Clock</label><select id="tc"></select></div><div><label for="theme">Theme</label><select id="theme"></select></div></div>
    <div class="row2"><div><label for="variant">Board</label><select id="variant"><option value="c">Classic 8x8</option><option value="g">Grand 10x10</option><option value="m">Mega 12x12</option></select></div><div><label>&nbsp;</label><button id="optbtn">Settings</button></div></div>
+   <div id="riv" style="display:none;gap:8px"><div class="row2"><div><label for="pw">White</label><select id="pw"></select></div><div><label for="pb">Black</label><select id="pb"></select></div></div><div class="btns"><button id="padd">Players</button><button id="pswap">Swap</button><button id="prst">Reset record</button></div><label><input type="checkbox" id="pauto"> Swap colors each game</label></div>
    <div id="eng"></div>
    <div id="stats"></div>
   </div>
@@ -240,6 +265,8 @@ body.noanim *{animation:none!important;transition:none!important}
 <label>White pieces <input type="color" id="opw"></label>
 <label>Black pieces <input type="color" id="opb"></label>
 <div class="btns"><button id="orst">Reset colors</button><button id="oX">Close</button></div></div></div>
+<div id="pl"><div><p>Players</p><div style="display:flex;gap:8px"><input id="pln" maxlength="16" placeholder="New player name" autocomplete="off"><button id="plA">Add</button></div><div id="plL"></div><div class="btns"><button id="plX">Close</button></div></div></div>
+<div id="ol"><div><p>Openings</p><input id="olq" placeholder="Search name or code" autocomplete="off"><div id="olL"></div><div class="btns"><button id="olX">Close</button></div></div></div>
 <div id="gd"><div><p>Piece guide</p><div id="gdL"></div><div class="btns"><button id="gdX">Close</button></div></div></div>
 <div id="net"><div><p>Play a friend online</p><small id="netMsg"></small>
 <div class="btns"><button id="netH">Host</button><button id="netJ">Join</button></div>
@@ -491,7 +518,7 @@ function engSend(c){if(eng)eng.postMessage(c);}
 function failEng(msg){
   if(engFail)return;
   engFail=true;engReady=false;thinking=false;
-  setEng('Stockfish could not start here ('+msg+'). Using the built-in bots instead. For full-strength Stockfish, download the file and open it in Chrome, Edge or Firefox.');
+  setEng('');
   document.getElementById('evalbar').style.display='none';
   render();setTimeout(maybeEngine,0);
 }
@@ -905,10 +932,11 @@ function endGame(res){
   result=res;clk.run=false;cancelSearch();
   render();checkEnd();save();
 }
-function showStats(){$('stats').textContent=(mode==='2p'||mode==='net')?'':'Record vs computer: W '+stats.w+'  L '+stats.l+'  D '+stats.d;}
+function showStats(){$('stats').textContent=(mode==='2p'||mode==='net')?'':'Record vs computer: W '+stats.w+'  L '+stats.l+'  D '+stats.d;if(typeof showRiv==='function')showRiv();}
 function checkEnd(){
-  if(counted||mode==='2p'||mode==='net'||redo.length||!over())return;
+  if(counted||mode==='net'||redo.length||!over())return;
   counted=true;
+  if(mode==='2p'){recRiv();return;}
   const human=mode==='cw'?'w':'b';let o='d';
   if(result)o=result.winner?(result.winner===human?'w':'l'):'d';
   else if(!allLegal(S).length&&inCheck(S,S.turn))o=S.turn===human?'l':'w';
@@ -1015,6 +1043,7 @@ function render(){
   });
   const cur=ml.querySelector('.cur');
   if(cur)ml.scrollTop=Math.max(0,cur.offsetTop-ml.clientHeight/2);else ml.scrollTop=0;
+  if(typeof updOpening==='function')updOpening();
 }
 
 // ---- input: click, drag
@@ -1076,6 +1105,16 @@ function endDrag(e,cancel){
 window.addEventListener('pointerup',e=>endDrag(e,false));
 window.addEventListener('pointercancel',e=>endDrag(e,true));
 
+// ---- announcer callouts
+function callout(m,mt,cap,n,chk){
+  const cnt=t=>t.b.filter(Boolean).length,L=hist.length;
+  if(cap&&cap.t==='q')return['QUEEN DOWN!','#ff6a5a','QUEEN!'];
+  if(m.ep)return['EN PASSANT!','#c79bff','EP!'];
+  try{const mv=n.b[m.to];if(mv){const mvv=VAL[mv.t]||3,tg=new Set(pseudo(n,m.to).filter(x=>{const t=n.b[x.to];return t&&t.c!==mv.c&&(t.t==='k'||(VAL[t.t]||3)>mvv);}).map(x=>x.to));if(tg.size>1)return['FORK!','#ffb347','FORK!'];}}catch(e){}
+  if(cap&&L>1){const pl=hist[L-1].prev.last;if(pl&&pl[1]===m.to&&cnt(hist[L-2].prev)>cnt(hist[L-1].prev))return['RECAPTURE!','#7fe08a','RECAP!'];}
+  if(cap&&cnt(n)===cnt(hist[0].prev)-1)return['FIRST BLOOD!','#ff6a5a','BLOOD!'];
+  return null;
+}
 // ---- playing a move
 function play(m,rem){
   if(redo.length)return;
@@ -1085,14 +1124,15 @@ function play(m,rem){
   repS=null;reviewData=reviewData;
   sel=null;legalCache=[];
   anim={t:mt,jump:isJump(mt,m),promo:m.promo,from:m.from,to:m.to,castle:m.castle,ep:m.ep,cap:cap,noSlide:skipSlide};skipSlide=false;
-  const chk=inCheck(n,n.turn),mate=chk&&!allLegal(n).length;
+  const chk=inCheck(n,n.turn),mate=chk&&!allLegal(n).length,co=mate?null:callout(m,mt,cap,n,chk);
   if(clk.on){if(hist.length>1)clk[wasTurn]+=clk.inc;clk.turn=n.turn;clk.last=performance.now();clk.run=true;}
   render();maybeEngine();
   if(mate)SFX.mate();
-  else if(chk){SFX.check();if(cap)SFX.cap();banner('CHECK!','#ff6a5a');}
+  else if(chk){SFX.check();if(cap)SFX.cap();banner(co?'CHECK + '+co[2]:'CHECK!','#ff6a5a');}
   else if(m.promo){SFX.promo();banner('PROMOTED!','#fff2a0');}
   else if(m.castle){SFX.castle();banner('CASTLED!','#7fb4e8');}
-  else if(cap)SFX.cap();else if(isJump(mt,m))SFX.hop();else SFX.move();
+  else if(cap){SFX.cap();if(co)banner(co[0],co[1]);}
+  else{if(isJump(mt,m))SFX.hop();else SFX.move();if(co)banner(co[0],co[1]);else if(!allLegal(n).length)banner('STALEMATE!','#7fb4e8');}
   checkEnd();save();
 }
 
@@ -1114,7 +1154,7 @@ function ask(msg,yes,no){
   $('dlgY').onclick=()=>{$('dlg').style.display='none';if(yes)yes();};
   $('dlgN').onclick=()=>{$('dlg').style.display='none';if(no)no();};
 }
-$('new').onclick=()=>{if(mode==='net'){netAsk(VK,$('tc').value);return;}if(!hist.length&&!redo.length)reset();else ask('Start a new game? The current one will be lost.',reset);};
+$('new').onclick=()=>{if(mode==='net'){netAsk(VK,$('tc').value);return;}if(!hist.length&&!redo.length)reset();else ask('Start a new game? The current one will be lost.',newRiv);};
 $('snd').onclick=()=>{snd=!snd;$('snd').textContent='Sound: '+(snd?'on':'off');if(snd){try{ctx();}catch(e){}SFX.move();}};
 $('hint').onclick=()=>{hintOn=!hintOn;$('hint').textContent='Hint: '+(hintOn?'on':'off');drawHint();};
 $('mode').onchange=()=>{
@@ -1409,6 +1449,214 @@ $('netJ').onclick=()=>{netRole='j';$('netT1').value='';$('netT2').value='';$('ne
 $('netGo').onclick=()=>netRole==='h'?hostFinish():netRole==='j'?joinMake():0;
 $('netCp').onclick=()=>{const t=$('netT1');t.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard)navigator.clipboard.writeText(t.value).catch(()=>{});$('netMsg').textContent='Code copied.';};
 $('netX').onclick=()=>{$('net').style.display='none';};
+// ---- local head-to-head (two players, same device)
+let riv=store.get('chess_riv')||{p:[],r:{},w:'',b:'',auto:false};
+const rkey=(a,b)=>[a,b].sort().join('|');
+const rivSave=()=>store.set('chess_riv',riv);
+function fillSel(el,val){el.textContent='';riv.p.forEach(n=>{const o=document.createElement('option');o.value=o.textContent=n;el.appendChild(o);});if(riv.p.includes(val))el.value=val;}
+function showRiv(){
+  const on=mode==='2p';$('riv').style.display=on?'grid':'none';
+  if(!on)return;
+  fillSel($('pw'),riv.w);fillSel($('pb'),riv.b);
+  if(riv.p.length>1&&$('pw').value===$('pb').value)$('pb').value=riv.p.find(n=>n!==$('pw').value);
+  riv.w=$('pw').value||'';riv.b=$('pb').value||'';$('pauto').checked=!!riv.auto;
+  const a=riv.w,b=riv.b;
+  if(!a||!b||a===b){$('stats').textContent=riv.p.length<2?'Add two players to keep a head-to-head record.':'Pick two different players.';return;}
+  const r=riv.r[rkey(a,b)]||{wins:{},d:0};
+  $('stats').textContent=a+' '+(r.wins[a]||0)+' - '+(r.wins[b]||0)+' '+b+'  (draws '+r.d+')';
+}
+function recRiv(){
+  const a=riv.w,b=riv.b;if(!a||!b||a===b)return;
+  let w=null;
+  if(result)w=result.winner||null;
+  else if(!allLegal(S).length&&inCheck(S,S.turn))w=S.turn==='w'?'b':'w';
+  const r=riv.r[rkey(a,b)]||(riv.r[rkey(a,b)]={wins:{},d:0});
+  if(w){const n=w==='w'?a:b;r.wins[n]=(r.wins[n]||0)+1;}else r.d++;
+  rivSave();showStats();
+}
+function newRiv(){
+  if(mode==='2p'&&riv.auto&&over()){const t=riv.w;riv.w=riv.b;riv.b=t;rivSave();}
+  reset();showStats();
+}
+function rivChange(fn){
+  const go=()=>{fn();rivSave();showStats();if(hist.length)reset();};
+  if(hist.length&&!over())ask('Changing players starts a new game. Continue?',go,()=>showRiv());else go();
+}
+$('pw').onchange=()=>rivChange(()=>{riv.w=$('pw').value;});
+$('pb').onchange=()=>rivChange(()=>{riv.b=$('pb').value;});
+$('pswap').onclick=()=>rivChange(()=>{const t=riv.w;riv.w=riv.b;riv.b=t;});
+$('pauto').onchange=()=>{riv.auto=$('pauto').checked;rivSave();};
+function plList(){
+  const L=$('plL');L.textContent='';
+  if(!riv.p.length){L.textContent='No players yet.';return;}
+  riv.p.forEach(n=>{
+    const d=document.createElement('div');d.className='plr';
+    const t=document.createElement('span');t.textContent=n;
+    const b=document.createElement('button');b.textContent='Remove';
+    b.onclick=()=>ask('Remove '+n+' and their records?',()=>{
+      riv.p=riv.p.filter(x=>x!==n);
+      for(const k in riv.r)if(k.split('|').includes(n))delete riv.r[k];
+      if(riv.w===n)riv.w='';if(riv.b===n)riv.b='';
+      rivSave();plList();showStats();if(hist.length)reset();
+    });
+    d.appendChild(t);d.appendChild(b);L.appendChild(d);
+  });
+}
+function plAdd(){
+  const el=$('pln'),n=el.value.replace(/[|]/g,'').trim().slice(0,16);
+  if(!n||riv.p.includes(n)){el.focus();return;}
+  riv.p.push(n);if(!riv.w)riv.w=n;else if(!riv.b&&n!==riv.w)riv.b=n;
+  el.value='';rivSave();plList();showStats();el.focus();
+}
+$('padd').onclick=()=>{$('pl').style.display='flex';plList();$('pln').focus();};
+$('plA').onclick=plAdd;
+$('pln').onkeydown=e=>{if(e.key==='Enter')plAdd();};
+$('plX').onclick=()=>{$('pl').style.display='none';};
+$('prst').onclick=()=>{if(!riv.w||!riv.b)return;ask('Reset the record for '+riv.w+' and '+riv.b+'?',()=>{delete riv.r[rkey(riv.w,riv.b)];rivSave();showStats();});};
+// ---- opening book (names, book moves, browser)
+const BOOK=`A00|Polish Opening|b4
+A00|Grob Opening|g4
+A01|Nimzo-Larsen Attack|b3
+A02|Bird's Opening|f4
+A04|Zukertort Opening|Nf3
+A04|Reti Opening|Nf3 d5 c4
+A07|King's Indian Attack|Nf3 d5 g3
+A10|English Opening|c4
+A20|English: King's English|c4 e5
+A30|English: Symmetrical|c4 c5
+A40|Queen's Pawn Game|d4
+A45|Indian Game|d4 Nf6
+A45|Trompowsky Attack|d4 Nf6 Bg5
+A46|Torre Attack|d4 Nf6 Nf3 e6 Bg5
+A51|Budapest Gambit|d4 Nf6 c4 e5
+A57|Benko Gambit|d4 Nf6 c4 c5 d5 b5
+A80|Dutch Defense|d4 f5
+A40|Englund Gambit|d4 e5
+B00|Nimzowitsch Defense|e4 Nc6
+B01|Scandinavian Defense|e4 d5
+B02|Alekhine's Defense|e4 Nf6
+B06|Modern Defense|e4 g6
+B07|Pirc Defense|e4 d6 d4 Nf6 Nc3 g6
+B10|Caro-Kann Defense|e4 c6
+B12|Caro-Kann: Advance|e4 c6 d4 d5 e5
+B13|Caro-Kann: Exchange|e4 c6 d4 d5 exd5 cxd5
+B18|Caro-Kann: Classical|e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5
+B20|Sicilian Defense|e4 c5
+B21|Sicilian: Smith-Morra Gambit|e4 c5 d4 cxd4 c3
+B22|Sicilian: Alapin|e4 c5 c3
+B23|Sicilian: Closed|e4 c5 Nc3
+B30|Sicilian: Rossolimo|e4 c5 Nf3 Nc6 Bb5
+B50|Sicilian: Open|e4 c5 Nf3 d6
+B70|Sicilian: Dragon|e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6
+B80|Sicilian: Scheveningen|e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6
+B90|Sicilian: Najdorf|e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6
+C00|French Defense|e4 e6
+C01|French: Exchange|e4 e6 d4 d5 exd5 exd5
+C02|French: Advance|e4 e6 d4 d5 e5
+C03|French: Tarrasch|e4 e6 d4 d5 Nd2
+C11|French: Classical|e4 e6 d4 d5 Nc3 Nf6
+C15|French: Winawer|e4 e6 d4 d5 Nc3 Bb4
+C20|King's Pawn Game|e4 e5
+C21|Danish Gambit|e4 e5 d4 exd4 c3
+C23|Bishop's Opening|e4 e5 Bc4
+C25|Vienna Game|e4 e5 Nc3
+C30|King's Gambit|e4 e5 f4
+C40|King's Knight Opening|e4 e5 Nf3
+C41|Philidor Defense|e4 e5 Nf3 d6
+C42|Petrov's Defense|e4 e5 Nf3 Nf6
+C44|Scotch Game|e4 e5 Nf3 Nc6 d4
+C45|Scotch: Main Line|e4 e5 Nf3 Nc6 d4 exd4 Nxd4
+C46|Four Knights Game|e4 e5 Nf3 Nc6 Nc3 Nf6
+C50|Italian Game|e4 e5 Nf3 Nc6 Bc4
+C51|Evans Gambit|e4 e5 Nf3 Nc6 Bc4 Bc5 b4
+C53|Giuoco Piano|e4 e5 Nf3 Nc6 Bc4 Bc5
+C55|Two Knights Defense|e4 e5 Nf3 Nc6 Bc4 Nf6
+C60|Ruy Lopez|e4 e5 Nf3 Nc6 Bb5
+C65|Ruy Lopez: Berlin|e4 e5 Nf3 Nc6 Bb5 Nf6
+C68|Ruy Lopez: Exchange|e4 e5 Nf3 Nc6 Bb5 a6 Bxc6
+C70|Ruy Lopez: Morphy Defense|e4 e5 Nf3 Nc6 Bb5 a6 Ba4
+C84|Ruy Lopez: Closed|e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7
+D00|Queen's Pawn: Mason|d4 d5
+D00|London System|d4 d5 Bf4
+D06|Queen's Gambit|d4 d5 c4
+D20|Queen's Gambit Accepted|d4 d5 c4 dxc4
+D30|Queen's Gambit Declined|d4 d5 c4 e6
+D31|Slav Defense|d4 d5 c4 c6
+D35|QGD: Exchange|d4 d5 c4 e6 Nc3 Nf6 cxd5 exd5
+D80|Grunfeld Defense|d4 Nf6 c4 g6 Nc3 d5
+E01|Catalan Opening|d4 Nf6 c4 e6 g3
+E12|Queen's Indian Defense|d4 Nf6 c4 e6 Nf3 b6
+E20|Nimzo-Indian Defense|d4 Nf6 c4 e6 Nc3 Bb4
+E60|King's Indian Defense|d4 Nf6 c4 g6
+*|Colton Opening / Defense|Nf3 Nf6 g3 g6 Bg2 Bg7 O-O O-O`.split('\n').map(l=>l.split('|'));
+let BI=null,coltW=false,coltB=false;
+const bkey=t=>toFEN(t).split(' ').slice(0,3).join(' ');
+const sanOf=(t,m,all)=>notation(t,m,apply(t,m),all).replace(/[+#]/g,'');
+function bookInit(){
+  if(BI)return BI;BI={name:{},next:{},list:[]};
+  for(const[eco,name,line]of BOOK){
+    try{
+      let t=newState();const ucis=[];
+      for(const tok of line.split(' ')){
+        const all=allLegal(t),m=all.find(x=>sanOf(t,x,all)===tok);if(!m)throw 0;
+        const k=bkey(t),nx=BI.next[k]||(BI.next[k]={}),a=nx[tok]||(nx[tok]=[]);if(!a.includes(name))a.push(name);
+        ucis.push(uciOf(m));t=apply(t,m);
+      }
+      BI.name[bkey(t)]={eco,name};BI.list.push({eco,name,ucis});
+    }catch(e){}
+  }
+  return BI;
+}
+function updOpening(){
+  const T=$('opnT'),B=$('opnB');if(!T)return;
+  T.textContent='';B.textContent='';
+  if(VK!=='c'||startFen)return;
+  const bi=bookInit(),st=hist.slice(0,40).map(h=>h.prev);if(hist.length<=40)st.push(S);
+  let cur=null;for(const t of st){const n=bi.name[bkey(t)];if(n)cur=n;}
+  const at=(q,t,c)=>{const p=S.b[sqIdx(q)];return !!p&&p.t===t&&p.c===c;};
+  const cw=at('f3','n','w')&&at('g3','p','w')&&at('g2','b','w')&&at('g1','k','w')&&at('f1','r','w');
+  const cb=at('f6','n','b')&&at('g6','p','b')&&at('g7','b','b')&&at('g8','k','b')&&at('f8','r','b');
+  const add=(txt,cls)=>{const d=document.createElement('div');if(cls)d.className=cls;d.textContent=txt;T.appendChild(d);};
+  if(cur&&cur.eco!=='*')add(cur.eco+' '+cur.name);
+  if(cw)add('\u2605 Colton Opening','co');
+  if(cb)add('\u2605 Colton Defense','co');
+  if(!T.firstChild)add(hist.length?'Out of book':'Opening: not started yet');
+  const live=!navigating&&!redo.length&&hist.length&&!over();
+  if(live&&cw&&!coltW)setTimeout(()=>banner('COLTON OPENING!','#ffd84a'),1100);
+  if(live&&cb&&!coltB)setTimeout(()=>banner('COLTON DEFENSE!','#ffd84a'),1100);
+  coltW=cw;coltB=cb;
+  const nx=hist.length<=40&&!over()?bi.next[bkey(S)]:null;
+  if(!nx)return;
+  const can=!reviewing&&!redo.length&&(mode==='2p'||(mode==='net'?S.turn===netColor:(mode==='cw'?S.turn==='w':S.turn==='b')));
+  Object.keys(nx).slice(0,6).forEach(tok=>{
+    const r=document.createElement('div');r.className='bk';
+    const b=document.createElement('button');b.textContent=tok;b.disabled=!can;
+    b.onclick=()=>{const all=allLegal(S),m=all.find(x=>sanOf(S,x,all)===tok);if(m)play(m);};
+    const sp=document.createElement('span');sp.textContent=nx[tok].filter(n=>n!=='Colton Opening / Defense').slice(0,2).join(', ')||'Colton line';
+    r.appendChild(b);r.appendChild(sp);B.appendChild(r);
+  });
+}
+function loadOpening(o){
+  const go=()=>{
+    if(VK!=='c')setVariant('c');
+    cancelSearch();S=newState();hist=[];redo=[];result=null;counted=false;startFen=null;reviewData=null;sel=null;legalCache=[];evalWhite=null;bestMv=null;
+    setClock($('tc').value);updClocks();loadLine(newState(),o.ucis);
+    $('ol').style.display='none';render();maybeEngine();save();
+  };
+  if(hist.length&&!over())ask('Replace the current game with this opening?',go);else go();
+}
+function olFill(q){
+  const L=$('olL');L.textContent='';q=(q||'').toLowerCase();
+  const rows=bookInit().list.flatMap(o=>o.eco==='*'?[{...o,eco:'\u2605',name:'Colton Opening (White)'},{...o,eco:'\u2605',name:'Colton Defense (Black)'}]:[o]);
+  rows.sort((a,b)=>(a.eco==='\u2605'?-1:0)-(b.eco==='\u2605'?-1:0)||a.eco.localeCompare(b.eco));
+  rows.filter(o=>!q||(o.eco+' '+o.name).toLowerCase().includes(q)).forEach(o=>{
+    const b=document.createElement('button');if(o.eco==='\u2605')b.className='st';
+    b.textContent=o.eco+' '+o.name;b.onclick=()=>loadOpening(o);L.appendChild(b);
+  });
+}
+$('opnAll').onclick=()=>{$('ol').style.display='flex';olFill('');$('olq').value='';$('olq').focus();};
+$('olq').oninput=()=>olFill($('olq').value);
+$('olX').onclick=()=>{$('ol').style.display='none';};
 // ---- startup
 function fillUI(){
   $('bot').innerHTML=BOTS.map((b,i)=>'<option value="'+i+'">'+b[0]+' ('+(b[1]>=3000?'full':b[1])+')</option>').join('');
